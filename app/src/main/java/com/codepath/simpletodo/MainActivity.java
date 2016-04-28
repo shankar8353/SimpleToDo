@@ -7,20 +7,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ArrayList<String> items;
-    private ArrayAdapter<String> itemsAdapter;
+    private ArrayList<Item> items;
+    private ItemAdapter itemsAdapter;
     private ListView lvItems;
 
     @Override
@@ -30,17 +34,19 @@ public class MainActivity extends AppCompatActivity {
 
         lvItems = (ListView) findViewById(R.id.lvItems);
         items = readItems();
-        itemsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
+        itemsAdapter = new ItemAdapter(this, items);
         lvItems.setAdapter(itemsAdapter);
-        items.add("First Item");
-        items.add("Second Item");
+        if (items.isEmpty()) {
+            items.add(new Item("Task 1"));
+            items.add(new Item("Task 2"));
+        }
         setupListViewListener();
     }
 
     public void onAddItem(View v) {
         EditText etNewItem = (EditText)findViewById(R.id.etNewItem);
         String itemText = etNewItem.getText().toString();
-        itemsAdapter.add(itemText);
+        itemsAdapter.add(new Item(itemText));
         etNewItem.setText("");
         writeItems();
     }
@@ -64,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Intent i = new Intent(MainActivity.this, EditItemActivity.class);
-                        i.putExtra("text", items.get(position));
+                        i.putExtra("item", items.get(position));
                         i.putExtra("position", position);
                         startActivityForResult(i, 0);
                     }
@@ -75,20 +81,31 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            String name = data.getExtras().getString("text");
+            Item item = (Item) data.getExtras().getSerializable("item");
             int position = data.getExtras().getInt("position", 0);
-            items.set(position, name);
+            items.set(position, item);
             itemsAdapter.notifyDataSetChanged();
             writeItems();
         }
     }
 
-    private ArrayList<String> readItems() {
+    private ArrayList<Item> readItems() {
         File todoFile = getTodoFile();
         try {
-            return new ArrayList<>(FileUtils.readLines(todoFile));
+            ArrayList<Item> todos = new ArrayList<>();
+            FileReader reader = new FileReader(todoFile);
+            CSVParser parser = CSVFormat.DEFAULT.parse(reader);
+            for (CSVRecord record : parser.getRecords()) {
+                Item item = new Item();
+                item.setName(record.get(0));
+                item.setPriority(Priority.valueOf(record.get(1)));
+                item.setStatus(Status.valueOf(record.get(2)));
+                todos.add(item);
+            }
+            reader.close();
+            return todos;
         }
-        catch (IOException e) {
+        catch (Exception e) {
             return new ArrayList<>();
         }
     }
@@ -96,7 +113,11 @@ public class MainActivity extends AppCompatActivity {
     private void writeItems() {
         File todoFile = getTodoFile();
         try {
-            FileUtils.writeLines(todoFile, items);
+            CSVPrinter printer = new CSVPrinter(new FileWriter(todoFile), CSVFormat.DEFAULT);
+            for (Item item : items) {
+                printer.printRecord(item.getName(), item.getPriority().name(), item.getStatus().name());
+            }
+            printer.close();
         }
         catch (IOException e) {
             e.printStackTrace();

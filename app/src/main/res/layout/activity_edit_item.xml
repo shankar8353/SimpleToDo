@@ -9,27 +9,68 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.codepath.simpletodo.EditItemActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Task:"
+        android:id="@+id/labelTask"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:editable="false"
+        android:textStyle="bold" />
+
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
         android:ems="10"
         android:id="@+id/etSave"
-        android:layout_below="@+id/textView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignRight="@+id/spStatus"
+        android:layout_alignEnd="@+id/spStatus" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Edit Item Below:"
-        android:id="@+id/textView"
-        android:layout_alignParentTop="true"
+        android:text="Priority:"
+        android:id="@+id/labelPriority"
+        android:layout_below="@+id/etSave"
+        android:layout_marginTop="25dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:editable="false"
         android:textStyle="bold" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spPriority"
+        android:layout_alignTop="@+id/labelPriority"
+        android:layout_alignRight="@+id/etSave"
+        android:layout_alignEnd="@+id/etSave"
+        android:layout_toRightOf="@+id/btnSave" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Status:"
+        android:id="@+id/labelStatus"
+        android:textStyle="bold"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/spPriority"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spStatus"
+        android:layout_alignTop="@+id/labelStatus"
+        android:layout_toRightOf="@+id/btnSave" />
 
     <Button
         android:layout_width="wrap_content"
@@ -37,7 +78,9 @@
         android:text="Save"
         android:id="@+id/btnSave"
         android:onClick="onSave"
-        android:layout_below="@+id/etSave"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/spStatus"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
 </RelativeLayout>
