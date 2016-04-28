@@ -29,6 +29,8 @@ The following **additional** features are implemented:
 
 Items marked as DONE are shown in strike through
 
+Data is stored in CSV format (instead of a database)
+
 
 ## Video Walkthrough 
 
